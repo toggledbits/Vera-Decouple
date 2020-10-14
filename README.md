@@ -51,20 +51,23 @@ First, make sure your Vera is fully configured:
 Second, you're going to need to decide if you want to continue to use external (cloud) time servers, or use a local (LAN) time server. It's not strictly necessary to use a local LAN server, and there are many ways to build such a server and end up no better than if you didn't have one and just stuck with the cloud. See my discussion toward the end of this document regarding the merits and problems of various options.
 
 * If your Internet access is stable most of the time and you rarely have power failures, and when you do have power failures, it's OK with you if the Vera needs a few minutes and maybe an automatic reboot/reload or two before it stabilizes, then using the default cloud time servers (pool.ntp.org) is OK. Note that even brief periods of "bogus" time on your Vera can cause it to fire date/time-based automations errantly.
-* If you regularly have no Internet access, frequent prolonged outages of Internet, requent power failures, or use a lot of time-based automations, then setting up a local NTP server is likely the better choice. Again, see the discussion on choosing/building an NTP time server near the end of this document.
+* If you regularly have no Internet access, frequent prolonged outages of Internet, frequent power failures, or use a lot of time-based automations, then setting up a local NTP server is likely the better choice. Again, see the discussion on choosing/building an NTP time server near the end of this document.
 
 Finally, you'll need to make a similar decision for DNS. The default DNS servers are the Google DNS servers at 8.8.8.8 and 8.8.4.4. This is probably fine, but there are good arguments to be made that a local DNS service provided by your router or another device in your network is actually a better choice. Either way, the availability of DNS will not affect system stability, so do what makes the most sense to you (I use my router's DNS cache/forwarder).
 
 > TIP: Your NTP and DNS servers, and your Vera, should all use static IP addresses, in case the network's DHCP server is down or fails.
 
+## Installing the Scripts
+
+To install the scripts, SSH into your Vera, and then:
+
+1. Fetch the script package: `wget `
+2. Unzip the script package: `unzip `
+3. You may delete the ZIP file if you wish: `rm `
+
 ## Configuring for Decoupling
 
-Configuration is done by modifying the `decouple-config.sh` file (only &mdash; do not modify the other files). This can be done on a Windows or other system before uploading the script package to your Vera, or you can just do the editing on your Vera. If you choose to do the latter, you should either be comfortable in `vi`, or have the alternate (and easier) `nano` editor installed. `nano` is not normally installed on factory Vera systems, so if you need it, you'll need to install it by issuing the following commands:
-
-```
-opkg update
-opkg install nano
-```
+Configuration is done by modifying the `decouple-config.sh` file (only &mdash; do not modify the other files). That means you'll need to use an editor on your Vera, and by default, the standard editor is `vi`, Bill Joy's wonderful ubiquitous visual editor that's as easy to learn as a saxophone. If you are comfortable in `vi`, no problem; if you need a more basic editor, proceed immediately to "Running `decouple.sh`" below, and the script will offer to install the `nano` editor for you. You can then edit the configuration file and run the script again.
 
 Everything in the configuration file has reasonable defaults. The default value will be used when the configuration variable is either commented out or set to blank. A variable is commented out when a '#' appears in the left margin before its name. To uncomment a variable, remove that '#', and then add any value to the right of the equal ('=') sign. Do not change the name of the variable, or add any spaces before or after the equal sign. Although it is usually not necessary, you can surround the value in double-quote marks (i.e. `DNSSERVER=192.168.0.1` and `DNSSERVER="192.168.0.1"` are equivalent).
 
