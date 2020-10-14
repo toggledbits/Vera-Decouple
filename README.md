@@ -75,11 +75,11 @@ Everything in the configuration file has reasonable defaults. The default value 
 
 OK. Ready? Let's see what we can configure. Remember, if any config variable is commented out or blank, the default shown will be used:
 
-* `NTPSERVER`: [default: `"0.openwrt.pool.ntp.org 1.openwrt.pool.ntp.org"`] Set to the IP address(es) of the NTP servers you would like to use.
-* `DNSSERVER`: [default: `"8.8.8.8 8.8.4.4"`] Set to the DNS servers you would like to use.
+* `NTPSERVER`: [default: `"0.openwrt.pool.ntp.org 1.openwrt.pool.ntp.org"`] Set to the IP address(es) of the NTP servers you would like to use. To remove dependency on Internet access, this should be one or more servers on your local LAN.
+* `DNSSERVER`: [default: `"8.8.8.8 8.8.4.4"` (Google DNS)] Set to the DNS servers you would like to use. The use of local or cloud DNS services makes little difference in stability to your Vera system. If your router provides DNS cache/forwarder service, that's a fine choice.
 * `LOG_SERVER`: [default: no log storage] Set to the (one) IP address of the server to receive logs. If blank/unset, logs are discarded. If set, you will also need to set `LOG_USER` and `LOG_PASS` to the username and password, respectively, of the FTP account on that server to receive the log files. You must also create a subdirectory of that account's home directory with the same name as the serial number of your Vera unit. The logs will be uploaded to this directory. FTP is the only protocol supported by this proces.
 * `SYSLOG_SERVER`: [default: no syslog logging] Set to the IP address of a SysLog remote server to receive logging from the Vera. If blank/not set, no remote Syslog logging will occur. The default protocol for logging is UDP, on destination port 514. You may the protocol to TCP by setting `SYSLOG_PROTO=tcp`; the port can be changed by setting `SYSLOG_PORT`.
-* `DAILY_BACKUP_SERVER`: [default: no automatic daily backups] Set to the IP address of a server to receive daily configuration backups from your Vera system. When you decouple from the cloud, the daily backups cannot be stored on Vera's servers. If blank/no set, no daily backups will be done and you must back up manually. You can set `DAILY_BACKUP_PROTO` to one of `ftp` (the default), `ftps` (for FTP+SSL), or `scp`. You should also set `DAILY_BACKUP_USER` and `DAILY_BACKUP_PASS` to the username and password of the account to receive the backup archives. A subdirectory in that account's home of the same name as the Vera serial number is required as well.
+* `DAILY_BACKUP_SERVER`: [default: no automatic daily backups] Set to the IP address of a server to receive daily configuration backups from your Vera system. When you decouple from the cloud, the daily backups cannot be stored on Vera's servers. If blank/not set, no daily backups will be done and you must back up manually. You can set `DAILY_BACKUP_PROTO` to one of `ftp` (the default), `ftps` (for FTP+SSL), or `scp`. You should also set `DAILY_BACKUP_USER` and `DAILY_BACKUP_PASS` to the username and password of the account to receive the backup archives. A subdirectory in that account's home of the same name as the Vera serial number is required as well.
 
 > If you are using `scp` for daily backup uploading and would like to use public key authentication rather than hard-coding a password here, set `DAILY_BACKUP_PASS` to `@`. Then retrieve your Vera's public key by running `dropbearkey -y -f /etc/dropbear/dropbear_rsa_host_key` on the Vera command line; copy/append that text *except the header and `Fingerprint` line* into the `authorized_keys` file or equivalent for the target system's user account (e.g. on Linux, this would be `~user/.ssh/authorized_keys` on the target server).
 
@@ -88,6 +88,27 @@ OK. Ready? Let's see what we can configure. Remember, if any config variable is 
 **ALWAYS BACK UP BEFORE RUNNING THE SCRIPT. BACK UP YOUR ZWAVE NETWORK AS WELL.**
 
 After making the necessary changes to the `decouple-config.sh` file, you can run the script: `sh decouple.sh`. The script will perform the necessary steps, and save original copies of modified configuration files in a (hidden) save directory, in case you want to recouple later. Follow any instructions the script gives you. Normally, the only instruction you will get is to reboot at the end. Once you've rebooted, decoupling is in full effect.
+
+```
+root@MiOS_500xxxxx:~# sh decouple.sh
+Running decouple.sh version 20288
+Preliminary checks OK. Decouple this Vera from cloud services [Y/N]? y
+Setting NTP server(s) to 192.168.0.15 192.168.0.44...
+Setting DNS server(s) to 192.168.0.15 192.168.0.44...
+Enabling syslog remote logging to 192.168.0.15...
+Setting up daily system backups to 192.168.0.164 via ftp...
+Disabling remote access...
+Disabling NetworkMonitor...
+Updating root's crontab...
+Decoupling Vera cloud servers...
+Turning on log uploads to 192.168.0.15...
+Connecting log server 192.168.0.15 for upload/rotation...
+
+OK. We're done here. Your Vera has been decoupled from the cloud services.
+When ready, please reboot by running /sbin/reboot
+root@MiOS_500xxxxx:~# /sbin/reboot
+    <remote server has disconnected>
+```
 
 > It's normal and expected that a decoupled Vera will have its "Service" LED extinguished. This indicates that the system is not connected to the Vera/MiOS/eZLO cloud services.
 
