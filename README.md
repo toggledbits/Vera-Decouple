@@ -30,13 +30,21 @@ Decoupling from Vera's cloud is not without consequences; these include:
 
 Common sense applies here. Vera has gone to great lengths to design a system that runs tightly with their cloud services. Disabling their cloud services forces the system to run in a manner counter to its design, and that has inherent risks known, anticipated, and unforeseen. You accept these risks as your own and are going in eyes wide open.
 
+## Status
+
+Vera Edge: Version 20288, tested by rigpapa 2020-10-14, running property on 5245 (7.32 beta)
+
+Vera Plus: Version 20288, tested by rigpapa 2020-10-14, running property on 5186 (7.31 GA)
+
+Vera Secure: NOT TESTED
+
 ## Preparation
 
-First, you should only decouple a system that is fully set up and running:
+First, make sure your Vera is fully configured:
 
-* The system is known in your controller list at home.getvera.com;
-* Your system's location settings are properly set (*Settings > Location*);
-* Your system is running the version of firmware that you want to run;
+* The unit is registered and listed in your Controllers list at https://home.getvera.com;
+* The unit's location settings are properly set (*Settings > Location*);
+* The unit is running the version of firmware that you want to run, and that version is supported by this tool;
 * All of the other settings under *Users & Account Info* are properly configured;
 * You have installed any plugins from the App Marketplace that can only be installed from there.
 
