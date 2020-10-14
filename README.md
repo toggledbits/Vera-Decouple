@@ -61,9 +61,11 @@ Finally, you'll need to make a similar decision for DNS. The default DNS servers
 
 To install the scripts, SSH into your Vera, and then:
 
-1. Fetch the script package: `wget `
-2. Unzip the script package: `unzip `
-3. You may delete the ZIP file if you wish: `rm `
+1. In your browser, go to the [Releases section of the Github repository](https://github.com/toggledbits/Vera-Decouple/releases) and **right-click** the "Source code (zip)" link of the current release, and choose "Copy link address";
+1. In your SSH window, type `curl -L -o decouple.zip` with a space after, then paste the link (use SHIFT-INS on Windows);
+2. Unzip the script package: `unzip decouple.zip`
+
+Once you've unzipped the archive, you may delete the ZIP archive if you wish.
 
 ## Configuring for Decoupling
 
@@ -71,41 +73,15 @@ Configuration is done by modifying the `decouple-config.sh` file (only &mdash; d
 
 Everything in the configuration file has reasonable defaults. The default value will be used when the configuration variable is either commented out or set to blank. A variable is commented out when a '#' appears in the left margin before its name. To uncomment a variable, remove that '#', and then add any value to the right of the equal ('=') sign. Do not change the name of the variable, or add any spaces before or after the equal sign. Although it is usually not necessary, you can surround the value in double-quote marks (i.e. `DNSSERVER=192.168.0.1` and `DNSSERVER="192.168.0.1"` are equivalent).
 
-OK. Ready? Let's see what we can configure...
+OK. Ready? Let's see what we can configure. Remember, if any config variable is commented out or blank, the default shown will be used:
 
-### NTP -- Network Time
+* `NTPSERVER`: [default: `"0.openwrt.pool.ntp.org 1.openwrt.pool.ntp.org"`] Set to the IP address(es) of the NTP servers you would like to use.
+* `DNSSERVER`: [default: `"8.8.8.8 8.8.4.4"`] Set to the DNS servers you would like to use.
+* `LOG_SERVER`: [default: no log storage] Set to the (one) IP address of the server to receive logs. If blank/unset, logs are discarded. If set, you will also need to set `LOG_USER` and `LOG_PASS` to the username and password, respectively, of the FTP account on that server to receive the log files. You must also create a subdirectory of that account's home directory with the same name as the serial number of your Vera unit. The logs will be uploaded to this directory. FTP is the only protocol supported by this proces.
+* `SYSLOG_SERVER`: [default: no syslog logging] Set to the IP address of a SysLog remote server to receive logging from the Vera. If blank/not set, no remote Syslog logging will occur. The default protocol for logging is UDP, on destination port 514. You may the protocol to TCP by setting `SYSLOG_PROTO=tcp`; the port can be changed by setting `SYSLOG_PORT`.
+* `DAILY_BACKUP_SERVER`: [default: no automatic daily backups] Set to the IP address of a server to receive daily configuration backups from your Vera system. When you decouple from the cloud, the daily backups cannot be stored on Vera's servers. If blank/no set, no daily backups will be done and you must back up manually. You can set `DAILY_BACKUP_PROTO` to one of `ftp` (the default), `ftps` (for FTP+SSL), or `scp`. You should also set `DAILY_BACKUP_USER` and `DAILY_BACKUP_PASS` to the username and password of the account to receive the backup archives. A subdirectory in that account's home of the same name as the Vera serial number is required as well.
 
-To use a local NTP server, uncomment and set the `NTPSERVER` variable to its IP address. If you want to use the default cloud (`openwrt.pool.ntp.org`) time servers, you can either leave this variable commented out or blank. If you want to provide your own server pool, put in the full hostname of the pool (e.g. if you're in Oz, you might decide to use `0.au.pool.ntp.org`). The closer the server/pool is, the better.
-
-If you have multiple NTP servers, list them comma-separated and surrounded in quotes, like this:
-
-```
-NTPSERVER="192.168.0.15 192.168.0.44"
-```
-
-### DNS -- Always Cloudy
-
-If you choose to use a local (LAN) DNS server, uncomment and set the `DNSSERVER` variable in `decouple-config.sh` to its IP address. To keep the system defaults (Google DNS), set the variable blank or leave it commented out.
-
-You can set multiple DNS servers by listing them with spaces between, surrounded in quotes:
-
-```
-DNSSERVER="192.168.0.15 192.168.0.44"
-```
-
-> No matter what we do, Vera will always require a source of DNS (Domain Name Service) services &mdash; one or more servers that translate internet names to addresses. This is so fundamental to the operation of any network device that it's impossible to completely divorce it from the cloud. DNS is probably *the* original cloud service, dating back many decades to the very origins of IP networking. Even if you have a local DNS server, it still reaches out over the Internet to other servers to resolve names; it's inescapable. The good news is, DNS failures generally do not affect stability of your Vera. It may cause plugins that use remote APIs some heartburn, but the most likely cause of DNS failures is loss of Internet access, and those plugins aren't getting to those APIs under those circumstances then anyway.
-
-### Vera Log Files (LuaUPnP.log)
-
-Veras optionally upload their log files to the Vera/eZLO cloud (a feature you can turn on and off through the UI). The `decouple.sh` script can redirect this uploading to a server on your LAN, if you choose. If you uncomment and set the `LOG_SERVER` variable in `decouple-config.sh`, the script will configure your Vera to upload logs to that target server. The target server must have FTP enabled; this is the only protocol available. You will need to create an FTP account on the server to which the log files can be uploaded. Supply the username and password for the account in the `LOG_USER` and `LOG_PASS` variables. The home directory on the FTP server must have a subdirectory named for the serial number of your Vera; this subdirectory is where the Vera will drop the files.
-
-The uploading of log files is controlled by the "Archive old logs on MiOS" setting in the Vera UI's *Settings > Logs* page. If you have set up a local log server, it will be turned on by the decouple. You can later turn the uploading off and on at will without disrupting the local target server configuration. Note, however, that if you *do not* set up a local log server when you decouple, and you enable this setting, the Vera will attempt to upload log files to a non-existent IP address and errors will be generated in various logs on the Vera. I'm not yet sure what the long-term effect may be, but it could include filling up disk space, so be careful here.
-
-### Daily Backups
-
-A cloud-coupled Vera will upload daily backups to the Vera/MiOS/eZLO cloud storage servers. Decoupled systems, of course, cannot. If you have a local server to which backups can be uploaded, uncomment and set `DAILY_BACKUP_SERVER` to its IP address. Set `DAILY_BACKUP_PROTO` to one of `ftp`, `ftps` (for FTP+SSL), or `scp` for the upload method, and set `DAILY_BACKUP_USER` and `DAILY_BACKUP_PASS` as needed.
-
-> If you are using `scp` and would like to use public key authentication rather than hard-coding a password here, set `DAILY_BACKUP_PASS` to `@`. Then retrieve your Vera's public key by running `dropbearkey -y -f /etc/dropbear/dropbear_rsa_host_key` on the Vera command line; copy/append that text *except the header and `Fingerprint` line* into the `authorized_keys` file or equivalent for the target system's user account (e.g. on Linux, this would be `~user/.ssh/authorized_keys` on the target server).
+> If you are using `scp` for daily backup uploading and would like to use public key authentication rather than hard-coding a password here, set `DAILY_BACKUP_PASS` to `@`. Then retrieve your Vera's public key by running `dropbearkey -y -f /etc/dropbear/dropbear_rsa_host_key` on the Vera command line; copy/append that text *except the header and `Fingerprint` line* into the `authorized_keys` file or equivalent for the target system's user account (e.g. on Linux, this would be `~user/.ssh/authorized_keys` on the target server).
 
 ## Running `decouple.sh`
 
