@@ -10,7 +10,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20287
+_VERSION=20288
 
 askyn() {
 	local __ans
@@ -125,6 +125,9 @@ if [ -n "$words" ]; then
 	uci delete dhcp.@dnsmasq[0].server
 	for s in $words; do
 		uci add_list dhcp.@dnsmasq[0].server="$s"
+	done
+	for s in weather.mios.com; do
+		uci add_list dhcp.@dnsmasq[0].server="/$s/"
 	done
 	uci commit dhcp
 	/etc/init.d/dnsmasq restart
@@ -281,15 +284,18 @@ for s in $(awk -F= '/^Server_/ { print $1 }' /etc/cmh/servers.conf); do
 	sed -i "s/^Settings_${s}=.*/Settings_${s}=${Z}/" /etc/cmh/services.conf
 done
 
+# PLATFORM: NA301 on 5245, dropbear starts at 50
+# PLATFORM: G450 on 5186, dropbear starts at 15 (before network at 20?)
 # Start dropbear earlier, so we can debug other startup problems more easily.
 if [ -L /etc/rc.d/S50dropbear ]; then
+	sed -i 's/START=.*/START=21/' /etc/init.d/dropbear
 	mv -f /etc/rc.d/S50dropbear /etc/rc.d/S21dropbear
 fi
 
 # Prevent the provisioning scripts from running at boot. We're provisioned,
 # and running it with no auth servers stalls the boot.
-rm -f /etc/rc.d/S*provision_vera.sh
-rm -f /etc/rc.d/S*cmh-ra
+rm -f /etc/rc.d/S*-provision_vera*
+rm -f /etc/rc.d/S*-cmh-ra
 
 # OpenWRT has a default sysfixtime that runs early (first) and does a good job of
 # approximating a usable time prior to NTP service. Vera then runs a script that
