@@ -61,8 +61,7 @@ Finally, you'll need to make a similar decision for DNS. The default DNS servers
 
 To install the scripts, SSH into your Vera, and then:
 
-1. In your browser, go to the [Releases section of the Github repository](https://github.com/toggledbits/Vera-Decouple/releases) and **right-click** the "Source code (zip)" link of the current release, and choose "Copy link address";
-1. In your SSH window, type `curl -L -o decouple.zip` with a space after, then paste the link (use SHIFT-INS on Windows);
+1. In your SSH window, type `curl -L -o decouple.zip https://codeload.github.com/toggledbits/Vera-Decouple/zip/main`
 2. Unzip the script package: `unzip decouple.zip`
 
 Once you've unzipped the archive, you may delete the ZIP archive if you wish.
@@ -114,7 +113,7 @@ root@MiOS_500xxxxx:~# /sbin/reboot
 
 The default location for the decoupler's saved configuration `/root/.decouple-saved` (you may need to do `ls -a` to see it), and I don't recommend that you change it, and don't delete it. It's not a bad idea to `tar` it along with the decouple and recouple scripts (e.g. `tar czf decouple-saved.taz .decouple-saved decouple.sh recouple.sh`), and save the archive off-system.
 
-If something goes wrong, you can usually fix the problem (following message instructions or enlisting my help), and then safely re-run the script. The script has considerable safeguards to ensure that original configurations are captured and preserved, and modifications are done properly if they haven't already been done.
+If something goes wrong, you can usually fix the problem (following message instructions or enlisting my help &mdash; see *Questions and Support* below), and then safely re-run the script. The script has considerable safeguards to ensure that original configurations are captured and preserved, and modifications are done properly if they haven't already been done.
 
 If you decide you want to change your decoupling configuration, it is usually only necessary to modify the `decouple-config.sh` file with your changes and re-run `decouple.sh`. It is *not* necessary to recouple first.
 
