@@ -96,19 +96,13 @@ DNSSERVER="192.168.0.15 192.168.0.44"
 
 Veras optionally upload their log files to the Vera/eZLO cloud (a feature you can turn on and off through the UI). The `decouple.sh` script can redirect this uploading to a server on your LAN, if you choose. If you uncomment and set the `LOG_SERVER` variable in `decouple-config.sh`, the script will configure your Vera to upload logs to that target server. The target server must have FTP enabled; this is the only protocol available. You will need to create an FTP account on the server to which the log files can be uploaded. Supply the username and password for the account in the `LOG_USER` and `LOG_PASS` variables. The home directory on the FTP server must have a subdirectory named for the serial number of your Vera; this subdirectory is where the Vera will drop the files.
 
-The uploading of log files is controlled by the "Archive old logs on MiOS" setting in the Vera UI's *Settings > Logs* page. If you have set up a local log server, you can turn the uploading on and off at will without disrupting the local target server configuration. Note, however, that if you do not set up a local log server when you decouple, and you enable this setting, the Vera will attempt to upload log files to a non-existent IP address and errors will be generated in various logs on the Vera. I'm not yet sure what the long-term effect may be, but it could include filling up disk space, so be careful here.
+The uploading of log files is controlled by the "Archive old logs on MiOS" setting in the Vera UI's *Settings > Logs* page. If you have set up a local log server, it will be turned on by the decouple. You can later turn the uploading off and on at will without disrupting the local target server configuration. Note, however, that if you *do not* set up a local log server when you decouple, and you enable this setting, the Vera will attempt to upload log files to a non-existent IP address and errors will be generated in various logs on the Vera. I'm not yet sure what the long-term effect may be, but it could include filling up disk space, so be careful here.
 
 ### Daily Backups
 
 A cloud-coupled Vera will upload daily backups to the Vera/MiOS/eZLO cloud storage servers. Decoupled systems, of course, cannot. If you have a local server to which backups can be uploaded, uncomment and set `DAILY_BACKUP_SERVER` to its IP address. Set `DAILY_BACKUP_PROTO` to one of `ftp`, `ftps` (for FTP+SSL), or `scp` for the upload method, and set `DAILY_BACKUP_USER` and `DAILY_BACKUP_PASS` as needed.
 
 > If you are using `scp` and would like to use public key authentication rather than hard-coding a password here, set `DAILY_BACKUP_PASS` to `@`. Then retrieve your Vera's public key by running `dropbearkey -y -f /etc/dropbear/dropbear_rsa_host_key` on the Vera command line; copy/append that text *except the header and `Fingerprint` line* into the `authorized_keys` file or equivalent for the target system's user account (e.g. on Linux, this would be `~user/.ssh/authorized_keys` on the target server).
-
-### Not Quite Everything
-
-Hardcoded within the UI is the access to Vera/MiOS's weather API. Since failing these requests is completely benign to system stability, I haven't spent any time worrying about decoupling them. Your Vera will continue to hit those cloud servers occasionally when Internet is available, and will quietly do nothing when Internet is not.
-
-If you discover any other cloud accesses after decoupling, please let me know.
 
 ## Running `decouple.sh`
 
@@ -118,7 +112,7 @@ After making the necessary changes to the `decouple-config.sh` file, you can run
 
 > It's normal and expected that a decoupled Vera will have its "Service" LED extinguished. This indicates that the system is not connected to the Vera/MiOS/eZLO cloud services.
 
-The default location for the decoupler's saved configuration `/root/.decouple-saved` (you may need to do `ls -a` to see it), and I don't recommend that you change it, and don't delete it. It's not a bad idea to tar it along with the decouple and recouple scripts, and save the archive off-system.
+The default location for the decoupler's saved configuration `/root/.decouple-saved` (you may need to do `ls -a` to see it), and I don't recommend that you change it, and don't delete it. It's not a bad idea to `tar` it along with the decouple and recouple scripts (e.g. `tar czf decouple-saved.taz .decouple-saved decouple.sh recouple.sh`), and save the archive off-system.
 
 If something goes wrong, you can usually fix the problem (following message instructions or enlisting my help), and then safely re-run the script. The script has considerable safeguards to ensure that original configurations are captured and preserved, and modifications are done properly if they haven't already been done.
 
@@ -132,7 +126,13 @@ The `recouple.sh` script is provided to allow you to recouple your Vera to the c
 
 Once you've recoupled, the decouple save directory (default `/root/.decouple-saved`) should be regarded as invalid and discarded.
 
-If you lose the decouple save directory or it becomes corrupt, the script will warn you and stop. You can override the stop by supplying the "-f" option on the command line. Any missing configuration will simply be restored to factory default, and the Vera should eventually update it to whatever settings the cloud services determine are correct for your unit. This is a fail-safe to ensure that you can always get back to cloud-connected service.
+If you lose the decouple save directory or it becomes corrupt, the script will warn you and stop. You can override the stop by supplying the `-f` option on the command line. Any missing configuration will simply be restored to factory default, and the Vera should eventually update it to whatever settings the cloud services determine are correct for your unit. This is a fail-safe to ensure that you can always get back to cloud-connected service.
+
+## Questions and Support
+
+**THIS IS VERY IMPORTANT! PLEASE PLAY BY THE RULES!**
+
+Because discussion of decoupling has in the past drifted into territory that has gotten people banned from the Vera Community, please **do not** ask questions or report problems there. Use the [Issues](https://github.com/toggledbits/Vera-Decouple/issues) section of this repository for that purpose exclusively.
 
 ## Considerations for Your Own NTP Time Server
 
