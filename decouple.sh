@@ -208,8 +208,6 @@ if ! fgrep 'Permissions_Relay=0' /etc/cmh/services.conf >/dev/null; then
 	echo "Disabling Vera's remote access services..."
 	sed -i 's/Permissions_Relay=.*/Permissions_Relay=0/' /etc/cmh/services.conf
 	/etc/init.d/cmh-ra stop
-else
-	echo "Looks like remote access has already been disabled; moving on..."
 fi
 
 echo "Disabling NetworkMonitor..."
@@ -324,7 +322,7 @@ fi
 
 cat <<EOF
 
-OK. We're done here. Your Vera has been decoupled from the cloud services.
+OK. We're done here. Your Vera has been decoupled from the Vera/eZLO cloud services.
 When ready, please reboot by running /sbin/reboot
 EOF
 
