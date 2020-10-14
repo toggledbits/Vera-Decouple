@@ -9,7 +9,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20287
+_VERSION=20288
 
 askyn() {
 	local __ans
@@ -166,10 +166,11 @@ done
 # an improvement Vera themselves should have made.
 
 # Restore provisioning at boot
-if [ -z "$(ls -1 /etc/rc.d/S*-provision_vera.sh 2>/dev/null)" ];
-	cp -P /mios/etc/rc.d/S*-provision_vera.sh /etc/rc.d/
+if [ -z "$(ls -1 /etc/rc.d/S*-provision_vera.sh 2>/dev/null)" ]; then
+	# Note on Edge is /mios, the .sh is missing; present on Plus
+	cp -P /mios/etc/rc.d/S*-provision_vera* /etc/rc.d/
 fi
-if [ -z "$(ls -1 /etc/rc.d/S*-cmh-ra 2>/dev/null)" ];
+if [ -z "$(ls -1 /etc/rc.d/S*-cmh-ra 2>/dev/null)" ]; then
 	cp -P /mios/etc/rc.d/S*-cmh-ra /etc/rc.d/
 fi
 
