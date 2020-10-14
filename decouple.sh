@@ -212,30 +212,24 @@ else
 	echo "Looks like remote access has already been disabled; moving on..."
 fi
 
+echo "Disabling NetworkMonitor..."
 if [ -L "/usr/bin/InternetOk" ]; then
-	echo "Replacing /usr/bin/InternetOk..."
 	rm -f /usr/bin/InternetOk # unlink
 	echo 'exit 0' >/usr/bin/InternetOk
 	chmod +x /usr/bin/InternetOk
-else
-	echo "Looks like /usr/bin/InteretOk has already been replaced; moving on..."
 fi
-
 if [ ! -f ${SAVEDIR}/check_internet ]; then
 	cp /etc/init.d/check_internet ${SAVEDIR}/
 fi
 if ! fgrep 'touch /var/run/nm.stop # decouple' /etc/init.d/check_internet >/dev/null; then
-	echo "Modifying NetworkMonitor startup script /etc/init.d/check_internet..."
-	awk '/bin\/Start_NetworkMonitor.sh/ { print "touch /var/run/nm.stop # decouple.sh"; print $0; next } { print; }' </etc/init.d/check_internet >/tmp/decouple.tmp && mv /tmp/decouple.tmp /etc/init.d/check_internet
+	awk '/bin\/Start_NetworkMonitor.sh/ { print "touch /var/run/nm.stop # decouple.sh"; print $0; next } { print; }' </etc/init.d/check_internet >/tmp/decouple.tmp && \
+		mv /tmp/decouple.tmp /etc/init.d/check_internet
 	chmod +x /etc/init.d/check_internet
-else
-	echo "Looks like /etc/init.d/check_internet has already been modified; moving on..."
 fi
-
 if [ ! -f /var/run/nm.stop ]; then
-	echo "Stopping running NetworkMonitor instance..."
 	touch /var/run/nm.stop
 fi
+/etc/init.d/check_insert stop >/dev/null 2>&1
 
 echo "Updating root's crontab..."
 if [ ! -f ${SAVEDIR}/crontab-root ]; then
@@ -255,27 +249,10 @@ BACKUPCRON
 fi
 crontab -u root /tmp/decouple.tmp && rm /tmp/decouple.tmp
 
-if [ "x${LOG_SERVER}" == "x" ]; then
-	echo "Turning off log uploads..."
-	sed -i 's/ArchiveLogsOnServer=1/ArchiveLogsOnServer=0/' /etc/cmh/cmh.conf
-else
-	echo "Turning on log uploads to ${LOG_SERVER}..."
-	sed -i 's/ArchiveLogsOnServer=0/ArchiveLogsOnServer=1/' /etc/cmh/cmh.conf
-fi
-
 echo "Decoupling Vera cloud servers..."
 if [ ! -f ${SAVEDIR}/servers.conf ]; then
 	cp /etc/cmh/servers.conf ${SAVEDIR}/servers.conf || exit 1
 fi
-
-awk '/^Server_/ { sub("=.*$", "=127.0.0."NR); print; next } { print }' < ${SAVEDIR}/servers.conf > /etc/cmh/servers.conf
-if [ -n "${LOG_SERVER:-}" ]; then
-	echo "Connecting log server ${LOG_SERVER} for upload/rotation..."
-	sed -i "s/Server_Log=.*/Server_Log=${LOG_SERVER}/" /etc/cmh/servers.conf
-	sed -i "s/Server_Log_User=.*/Server_Log_User=${LOG_USER}/" /etc/cmh/servers.conf
-	sed -i "s/Server_Log_Pass=.*/Server_Log_Pass=${LOG_PASS}/" /etc/cmh/servers.conf
-fi
-
 . /etc/cmh/servers.conf
 for s in $(awk -F= '/^Server_/ { print $1 }' /etc/cmh/servers.conf); do
 	eval "Z=\$$s"
@@ -283,6 +260,23 @@ for s in $(awk -F= '/^Server_/ { print $1 }' /etc/cmh/servers.conf); do
 	nvram get mios_${s} >/dev/null && nvram set mios_${s}=${Z}
 	sed -i "s/^Settings_${s}=.*/Settings_${s}=${Z}/" /etc/cmh/services.conf
 done
+
+
+if [ -z "${LOG_SERVER:-}" ]; then
+	echo "Turning off log uploads..."
+	sed -i 's/ArchiveLogsOnServer=1/ArchiveLogsOnServer=0/' /etc/cmh/cmh.conf
+else
+	echo "Turning on log uploads to ${LOG_SERVER}..."
+	sed -i 's/ArchiveLogsOnServer=0/ArchiveLogsOnServer=1/' /etc/cmh/cmh.conf
+	sed -i "s/Server_Log_User=.*/Server_Log_User=/" /etc/cmh/servers.conf
+	sed -i "s/Server_Log_Pass=.*/Server_Log_Pass=/" /etc/cmh/servers.conf
+fi
+awk '/^Server_/ { sub("=.*$", "=127.0.0."NR); print; next } { print }' < ${SAVEDIR}/servers.conf > /etc/cmh/servers.conf
+if [ -n "${LOG_SERVER:-}" ]; then
+	sed -i "s/Server_Log=.*/Server_Log=${LOG_SERVER}/" /etc/cmh/servers.conf
+	sed -i "s/Server_Log_User=.*/Server_Log_User=${LOG_USER}/" /etc/cmh/servers.conf
+	sed -i "s/Server_Log_Pass=.*/Server_Log_Pass=${LOG_PASS}/" /etc/cmh/servers.conf
+fi
 
 # PLATFORM: NA301 on 5245, dropbear starts at 50
 # PLATFORM: G450 on 5186, dropbear starts at 15 (before network at 20?)
