@@ -173,6 +173,7 @@ fi
 if [ -z "$(ls -1 /etc/rc.d/S*-cmh-ra 2>/dev/null)" ]; then
 	cp -P /mios/etc/rc.d/S*-cmh-ra /etc/rc.d/
 fi
+# NB: Not replacing mios_fix_time, since its brokenness is regressive.
 
 # And our own boot script
 rm -f /etc/init.d/decouple /etc/rc.d/S*decouple
