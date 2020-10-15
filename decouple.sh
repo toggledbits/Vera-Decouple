@@ -10,7 +10,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20288
+_VERSION=20289
 
 askyn() {
 	local __ans
@@ -216,6 +216,14 @@ if [ -L "/usr/bin/InternetOk" ]; then
 	echo 'exit 0' >/usr/bin/InternetOk
 	chmod +x /usr/bin/InternetOk
 fi
+grep '^elif' /usr/bin/Rotate_Logs.sh | grep -F '/var/run/nm.stop' >/dev/null || {
+	rm -f /usr/bin/Rotate_Logs.sh
+	sed '/^NM_WATCHDOG_FILE=/,/^else/{/else/i \
+elif [ -e /var/run/nm.stop ]; then # decouple addition \
+	log "NM Stopped" \
+	echo 1 > $NM_WATCHDOG_FILE
+	}' </mios/usr/bin/Rotate_Logs.sh >/usr/bin/Rotate_Logs.sh
+}
 if [ ! -f ${SAVEDIR}/check_internet ]; then
 	cp /etc/init.d/check_internet ${SAVEDIR}/
 fi
@@ -288,6 +296,7 @@ fi
 # and running it with no auth servers stalls the boot.
 rm -f /etc/rc.d/S*-provision_vera*
 rm -f /etc/rc.d/S*-cmh-ra
+rm -f /etc/rc.d/S*-mios_fix_time
 
 # OpenWRT has a default sysfixtime that runs early (first) and does a good job of
 # approximating a usable time prior to NTP service. Vera then runs a script that
