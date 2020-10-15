@@ -10,7 +10,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20289
+_VERSION=20290
 
 askyn() {
 	local __ans
@@ -189,6 +189,7 @@ SCPBACKUPSCRIPT
 		cat <<FTPBACKUPSCRIPT >/usr/bin/decouple_daily_backup.sh
 #!/bin/sh
 
+# DO NOT EDIT -- AUTOMATICALLY GENERATED FILE
 # This file is part of rigpapa's decoupler. See https://github.com/toggledbits/Vera-Decouple
 
 ser="\$(nvram get vera_serial)"
@@ -244,15 +245,14 @@ echo "Updating root's crontab..."
 if [ ! -f ${SAVEDIR}/crontab-root ]; then
 	crontab -u root -l > ${SAVEDIR}/crontab-root
 fi
+# 20290: &servi pattern is to fix a stray newline output in 20289
 crontab -u root -l | \
-	grep -v 'decouple_daily_backup' | \
+	grep -Fv '# decouple_daily_backup' | \
+	grep -v '&servi *$' | \
 	awk '/^#/ { print; next } /Rotate_Logs/ { print; next } { print "#"$0 }' >/tmp/decouple.tmp
 if [ -n "${DAILY_BACKUP_SERVER:-}" ]; then
 	cat <<BACKUPCRON >>/tmp/decouple.tmp
-# ZWave dongle backup
-23 0 * * * curl -o - -m 30 'http://127.0.0.1:3480/data_request?id=action&serviceId=urn:micasaverde-com:servi
-ceId:ZWaveNetwork1&action=BackupDongle&DeviceNum=1' 2>&1 | logger -t decouple_daily_backup # decouple_daily_backup
-# System backup after dongle
+23 0 * * * curl -o - -m 30 'http://127.0.0.1:3480/data_request?id=action&serviceId=urn:micasaverde-com:serviceId:ZWaveNetwork1&action=BackupDongle&DeviceNum=1' 2>&1 | logger -t decouple_daily_backup # decouple_daily_backup
 5 0 * * * /usr/bin/decouple_daily_backup.sh 2>&1 | logger -t decouple_daily_backup # decouple_daily_backup
 BACKUPCRON
 fi
