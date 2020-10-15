@@ -32,13 +32,13 @@ Common sense applies here. Vera has gone to great lengths to design a system tha
 
 ## Status
 
-Vera Plus: recommended version 20289
+Vera Plus: recommended version 20290
 	* Tested on 7.31 GA (5186) by rigpapa 2020-10-15, no issues.
 
 Vera Secure: **NOT YET TESTED**
 	* If you are a Vera Secure user, please report your findings in the Github repository [Issues](https://github.com/toggledbits/Vera-Decouple/issues) section.
 
-Vera Edge: recommended version 20289
+Vera Edge: recommended version 20290
 	* Tested on 7.32 Beta (5245) by rigpapa 2020-10-15, no issues.
 
 ## Preparation
