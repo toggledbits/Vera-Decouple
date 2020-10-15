@@ -15,17 +15,20 @@ _VERSION=20289
 askyn() {
 	local __ans
 	local __resultvar
-	__resultvar="$1"
+	__resultvar="${1:-ans}"
 	while true; do
-		echo -e -n "$2"
+		echo -e -n "${2:-}"
 		read __ans
-		if [[ "x$__ans" == "xy" || "x$__ans" == "xY" ]]; then
-			eval "${__resultvar}=Y"
-			break
-		elif [[ "x$__ans" == "xn" || "x$__ans" == "xN" ]]; then
-			eval "${__resultvar}=N"
-			break
-		fi
+		case "$__ans" in
+			[Yy]* )
+				eval "${__resultvar}=Y"
+				break
+				;;
+			[Nn]* )
+				eval "${__resultvar}=N"
+				break
+				;;
+		esac
 		echo "Please answer Y or N."
 	done
 }
