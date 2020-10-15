@@ -9,7 +9,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20289
+_VERSION=20290
 
 askyn() {
 	local __ans
@@ -127,7 +127,7 @@ if [ ! -L /usr/bin/InternetOk ]; then
 fi
 
 keep_local_backup=N
-if fgrep 'decouple_daily_backup' /etc/crontabs/root >/tmp/decouple-cron ; then
+if fgrep '# decouple_daily_backup' /etc/crontabs/root >/tmp/decouple-cron ; then
 	echo ; echo "Local daily backups are enabled. Recoupling will restart the cloud backups to"
 	echo "Vera/MiOS/eZLO, but you have the option of continuing the local backups simul-"
 	echo "taneously or disabling them."
