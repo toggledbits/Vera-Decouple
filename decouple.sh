@@ -202,7 +202,7 @@ cat /tmp/Backup_download.tgz | ${cmd} ftp://\${target_auth}@\${target_host}/\${d
 rm -f /tmp/Backup_download.tgz
 FTPBACKUPSCRIPT
 	fi
-	chmod +x /usr/bin/decouple_daily_backup.sh
+	chmod +rx /usr/bin/decouple_daily_backup.sh
 fi
 
 if [ ! -f ${SAVEDIR}/services.conf ]; then
@@ -218,28 +218,33 @@ echo "Disabling NetworkMonitor..."
 if [ -L "/usr/bin/InternetOk" ]; then
 	rm -f /usr/bin/InternetOk # unlink
 	echo 'exit 0' >/usr/bin/InternetOk
-	chmod +x /usr/bin/InternetOk
 fi
-grep '^elif' /usr/bin/Rotate_Logs.sh | grep -F '/var/run/nm.stop' >/dev/null || {
+chmod +rx /usr/bin/InternetOk
+if grep '^NM_WATCHDOG_FILE=' /usr/bin/Rotate_Logs.sh >/dev/null; then
 	rm -f /usr/bin/Rotate_Logs.sh
-	sed '/^NM_WATCHDOG_FILE=/,/^else/{/else/i \
-elif [ -e /var/run/nm.stop ]; then # decouple addition \
-	log "NM Stopped" \
-	echo 1 > $NM_WATCHDOG_FILE
-	}' </mios/usr/bin/Rotate_Logs.sh >/usr/bin/Rotate_Logs.sh
-}
+	sed '/^NM_WATCHDOG_FILE=/,/^fi/c \
+		# decouple removed \
+		' </mios/usr/bin/Rotate_Logs.sh >/usr/bin/Rotate_Logs.sh
+fi
+chmod +rx /usr/bin/Rotate_Logs.sh
+if ! grep '^exit 0 # decouple' /usr/bin/Start_NetworkMonitor.sh >/dev/null; then
+	sed '/===BEGIN===/a \
+log "$0 disabled by decouple" # decouple \
+touch /var/run/nm.stop # decouple \
+exit 0 # decouple \
+' </mios/usr/bin/Start_NetworkMonitor.sh >/usr/bin/Start_NetworkMonitor.sh
+fi
+chmod +rx /usr/bin/Start_NetworkMonitor.sh
 if [ ! -f ${SAVEDIR}/check_internet ]; then
 	cp /etc/init.d/check_internet ${SAVEDIR}/
 fi
 if ! fgrep 'touch /var/run/nm.stop # decouple' /etc/init.d/check_internet >/dev/null; then
 	awk '/bin\/Start_NetworkMonitor.sh/ { print "touch /var/run/nm.stop # decouple.sh"; print $0; next } { print; }' </etc/init.d/check_internet >/tmp/decouple.tmp && \
 		mv /tmp/decouple.tmp /etc/init.d/check_internet
-	chmod +x /etc/init.d/check_internet
 fi
-if [ ! -f /var/run/nm.stop ]; then
-	touch /var/run/nm.stop
-fi
-/etc/init.d/check_insert stop >/dev/null 2>&1
+chmod +rx /etc/init.d/check_internet
+/etc/init.d/check_internet stop >/dev/null 2>&1
+touch /var/run/nm.stop
 
 echo "Updating root's crontab..."
 if [ ! -f ${SAVEDIR}/crontab-root ]; then
@@ -299,13 +304,12 @@ fi
 # and running it with no auth servers stalls the boot.
 rm -f /etc/rc.d/S*-provision_vera*
 rm -f /etc/rc.d/S*-cmh-ra
-rm -f /etc/rc.d/S*-mios_fix_time
 
 # OpenWRT has a default sysfixtime that runs early (first) and does a good job of
 # approximating a usable time prior to NTP service. Vera then runs a script that
 # undoes that, disastrously. Disable the Vera script on systems that don't have RTC
 # (I'm not even sure what, if any, do).
-[ -e /dev/rtc0 ] || rm -f /etc/rc.d/S*mios_fix_time.sh # They actually break OpenWRT's working default with this
+[ -e /dev/rtc0 ] || rm -f /etc/rc.d/S*mios_fix_time*
 
 # Our own startup script
 cat <<BOOTSCRIPT >/etc/init.d/decouple
@@ -317,7 +321,7 @@ boot() {
 	/usr/bin/set_led.sh off service
 }
 BOOTSCRIPT
-chmod +x /etc/init.d/decouple
+chmod +rx /etc/init.d/decouple
 ( cd /etc/rc.d/ ; ln -sf ../init.d/decouple S999decouple )
 
 cp decouple-config.sh ${SAVEDIR}/
