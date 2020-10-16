@@ -119,7 +119,10 @@ if [ ! -s ${SAVEDIR}/check_internet ]; then
 else
 	fgrep -v 'touch /var/run/nm.stop # decouple' ${SAVEDIR}/check_internet > /etc/init.d/check_internet
 fi
-chmod +x /etc/init.d/check_internet
+chmod +rx /etc/init.d/check_internet
+cp -p /mios/usr/bin/Rotate_Logs.sh /usr/bin/
+cp -p /mios/usr/bin/Start_NetworkMonitor.sh /usr/bin/
+chmod +rx /usr/bin/Rotate_Logs.sh /usr/bin/Start_NetworkMonitor.sh
 rm -f /var/run/nm.stop
 if [ ! -L /usr/bin/InternetOk ]; then
 	rm /usr/bin/InternetOk
