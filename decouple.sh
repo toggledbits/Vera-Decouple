@@ -217,7 +217,7 @@ fi
 echo "Disabling NetworkMonitor..."
 if [ -L "/usr/bin/InternetOk" ]; then
 	rm -f /usr/bin/InternetOk # unlink
-	echo 'exit 0' >/usr/bin/InternetOk
+	echo 'exit 0 # decouple' >/usr/bin/InternetOk
 fi
 chmod +rx /usr/bin/InternetOk
 if grep '^NM_WATCHDOG_FILE=' /usr/bin/Rotate_Logs.sh >/dev/null; then
@@ -228,6 +228,7 @@ if grep '^NM_WATCHDOG_FILE=' /usr/bin/Rotate_Logs.sh >/dev/null; then
 fi
 chmod +rx /usr/bin/Rotate_Logs.sh
 if ! grep '^exit 0 # decouple' /usr/bin/Start_NetworkMonitor.sh >/dev/null; then
+	rm -f /usr/bin/Start_NetworkMonitor.sh
 	sed '/===BEGIN===/a \
 log "$0 disabled by decouple" # decouple \
 touch /var/run/nm.stop # decouple \
