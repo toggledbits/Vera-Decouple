@@ -2,6 +2,10 @@
 
 https://github.com/toggledbits/Vera-Decouple
 
+## 20294
+
+* Make sure the alerts stay clear and system doesn't get bogged down trying to send alerts that cannot be delivered.
+
 ## 20290
 
 * Fixed an issue where 20289 inserted an additiona  line feed in a cron job. To repair, you can either hand-edit the cron script (`crontab -u root -e`, join the "23 0" job and the line after), or just (re)run `decouple.sh` after updating to this version.

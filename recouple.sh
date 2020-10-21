@@ -9,7 +9,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20290
+_VERSION=20294
 
 askyn() {
 	local __ans
@@ -130,7 +130,7 @@ if [ ! -L /usr/bin/InternetOk ]; then
 fi
 
 keep_local_backup=N
-if fgrep '# decouple_daily_backup' /etc/crontabs/root >/tmp/decouple-cron ; then
+if fgrep 'decouple_daily_backup.sh' /etc/crontabs/root >/tmp/decouple-cron ; then
 	echo ; echo "Local daily backups are enabled. Recoupling will restart the cloud backups to"
 	echo "Vera/MiOS/eZLO, but you have the option of continuing the local backups simul-"
 	echo "taneously or disabling them."
@@ -167,6 +167,7 @@ for s in $(awk -F= '/^Server_/ { print $1 }' /etc/cmh/servers.conf); do
 	nvram get mios_${s} >/dev/null && nvram set mios_${s}=${Z}
 	sed -i "s/^Settings_${s}=.*/Settings_${s}=${Z}/" /etc/cmh/services.conf
 done
+nvram commit >/dev/null 2>&1
 
 # Note we don't undo the move of dropbear because it's harmless and actually,
 # an improvement Vera themselves should have made.

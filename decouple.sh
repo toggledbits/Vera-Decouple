@@ -10,7 +10,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20290
+_VERSION=20294
 
 askyn() {
 	local __ans
@@ -168,7 +168,9 @@ if [ -n "${DAILY_BACKUP_SERVER:-}" ]; then
 		cat <<SCPBACKUPSCRIPT >/usr/bin/decouple_daily_backup.sh
 #!/bin/sh
 
+# DO NOT EDIT -- AUTOMATICALLY GENERATED FILE
 # This file is part of rigpapa's decoupler. See https://github.com/toggledbits/Vera-Decouple
+# Created by $_VERSION on $(date)
 
 ser="\$(nvram get vera_serial)"
 target="${targ}"
@@ -191,6 +193,7 @@ SCPBACKUPSCRIPT
 
 # DO NOT EDIT -- AUTOMATICALLY GENERATED FILE
 # This file is part of rigpapa's decoupler. See https://github.com/toggledbits/Vera-Decouple
+# Created by $_VERSION on $(date)
 
 ser="\$(nvram get vera_serial)"
 target_host="${DAILY_BACKUP_SERVER}"
@@ -253,13 +256,17 @@ if [ ! -f ${SAVEDIR}/crontab-root ]; then
 fi
 # 20290: &servi pattern is to fix a stray newline output in 20289
 crontab -u root -l | \
-	grep -Fv '# decouple_daily_backup' | \
+	grep -Fv '# decouple' | \
 	grep -v '&servi *$' | \
-	awk '/^#/ { print; next } /Rotate_Logs/ { print; next } { print "#"$0 }' >/tmp/decouple.tmp
+	awk '/^#/ { print; next } /Rotate_Logs/ { print; next } { print "# "$0 }' >/tmp/decouple.tmp
+cat <<CRONMORE >>/tmp/decouple.tmp
+# decouple additions ($_VERSION)
+0 */4 * * * rm -f /etc/cmh/alerts.json /etc/cmh/persist/* # decouple
+CRONMORE
 if [ -n "${DAILY_BACKUP_SERVER:-}" ]; then
 	cat <<BACKUPCRON >>/tmp/decouple.tmp
-23 0 * * * curl -o - -m 30 'http://127.0.0.1:3480/data_request?id=action&serviceId=urn:micasaverde-com:serviceId:ZWaveNetwork1&action=BackupDongle&DeviceNum=1' 2>&1 | logger -t decouple_daily_backup # decouple_daily_backup
-5 0 * * * /usr/bin/decouple_daily_backup.sh 2>&1 | logger -t decouple_daily_backup # decouple_daily_backup
+23 0 * * * curl -o - -m 30 'http://127.0.0.1:3480/data_request?id=action&serviceId=urn:micasaverde-com:serviceId:ZWaveNetwork1&action=BackupDongle&DeviceNum=1' 2>&1 | logger -t decouple_daily_backup # decouple
+5 0 * * * /usr/bin/decouple_daily_backup.sh 2>&1 | logger -t decouple_daily_backup # decouple
 BACKUPCRON
 fi
 crontab -u root /tmp/decouple.tmp && rm /tmp/decouple.tmp
@@ -275,7 +282,7 @@ for s in $(awk -F= '/^Server_/ { print $1 }' /etc/cmh/servers.conf); do
 	nvram get mios_${s} >/dev/null && nvram set mios_${s}=${Z}
 	sed -i "s/^Settings_${s}=.*/Settings_${s}=${Z}/" /etc/cmh/services.conf
 done
-
+nvram commit >/dev/null 2>&1
 
 if [ -z "${LOG_SERVER:-}" ]; then
 	echo "Turning off log uploads..."
@@ -315,6 +322,8 @@ rm -f /etc/rc.d/S*-cmh-ra
 # Our own startup script
 cat <<BOOTSCRIPT >/etc/init.d/decouple
 #!/bin/sh /etc/rc.common
+
+# Inserted by decouple $_VERSION
 
 START=999
 
