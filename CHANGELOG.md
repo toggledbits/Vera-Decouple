@@ -2,6 +2,10 @@
 
 https://github.com/toggledbits/Vera-Decouple
 
+## 20301
+
+* Disable apps.mios.com
+
 ## 20294
 
 * Make sure the alerts stay clear and system doesn't get bogged down trying to send alerts that cannot be delivered.
