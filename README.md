@@ -9,6 +9,8 @@ The only required services are DNS and NTP (time), and a lapse in the former doe
 
 The scripts also make facilities for local (LAN) storage of rotated log files and daily configuration backups.
 
+What decoupling *does not do* is restrict the Vera from accessing cloud or other Internet-based services at all. While it principally removes Vera's cloud services, it does not prevent you from using other services if they are important to your automations/configuration. A decoupled Vera will therefore happily collect weather data from a third-party API, or operate your garden sprinklers, smart garage door openers or thermostats, through their respective cloud services. Eliminating these cloud connections, if that is your goal, is elective for you and simply a matter of not using those plugins.
+
 ## System Requirements
 
 These scripts are intended only for Vera Plus, Secure and Edge system running 7.0.29 firmware or higher (to the current release version as of this writing). Users on 7.0.30, which existed only in a public beta, are advised to upgrade to 7.0.31, as the earlier firmware has a specific defect that causes "Christmas Lights" (blinking status lights on an otherwise dead unit) when Internet access becomes unavailable for an extended period of time.
@@ -32,13 +34,13 @@ Common sense applies here. Vera has gone to great lengths to design a system tha
 
 ## Status
 
-Vera Plus: recommended version 20294
+Vera Plus: recommended version 20301
 	* Tested on 7.31 GA (5186) by rigpapa 2020-10-20, no issues.
 
 Vera Secure: **NOT YET TESTED**
 	* If you are a Vera Secure user, please report your findings in the Github repository [Issues](https://github.com/toggledbits/Vera-Decouple/issues) section.
 
-Vera Edge: recommended version 20294
+Vera Edge: recommended version 20301
 	* Tested on 7.32 Beta (5245) by rigpapa 2020-10-20, no issues.
 
 ## Preparation
