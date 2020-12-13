@@ -40,3 +40,8 @@
 #DAILY_BACKUP_PROTO="ftp"
 #DAILY_BACKUP_USER="verabackup"
 #DAILY_BACKUP_PASS='magicwordsheretoo'
+
+# KEEP_MIOS_WEATHER, if non-zero, will cause the MiOS cloud weather service to NOT
+# be decoupled/disabled, so that weather information will continue to be displayed
+# in the UI and by the VOTS plugin.
+#KEEP_MIOS_WEATHER=1

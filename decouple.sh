@@ -10,7 +10,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20301
+_VERSION=20347
 
 askyn() {
 	local __ans
@@ -129,7 +129,12 @@ if [ -n "$words" ]; then
 	for s in $words; do
 		uci add_list dhcp.@dnsmasq[0].server="$s"
 	done
-	for s in weather.mios.com apps.mios.com; do
+	if [ ${KEEP_MIOS_WEATHER:-0} -ne 0 ]; then
+		noms="apps.mios.com"
+	else
+		noms="weather.mios.com apps.mios.com"
+	fi
+	for s in ${noms}; do
 		uci add_list dhcp.@dnsmasq[0].server="/$s/"
 	done
 	uci commit dhcp

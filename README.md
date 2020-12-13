@@ -34,13 +34,13 @@ Common sense applies here. Vera has gone to great lengths to design a system tha
 
 ## Status
 
-Vera Plus: recommended version 20301
-	* Tested on 7.31 GA (5186) by rigpapa 2020-10-20, no issues.
+Vera Plus: recommended version 20347
+	* Tested on 7.31 GA (5186) by rigpapa 2020-12-12, no issues.
 
-Vera Secure: **NOT YET TESTED**
+Vera Secure: **NOT YET TESTED** but expected to work; recommended version 20347
 	* If you are a Vera Secure user, please report your findings in the Github repository [Issues](https://github.com/toggledbits/Vera-Decouple/issues) section.
 
-Vera Edge: recommended version 20301
+Vera Edge: recommended version 20347
 	* Tested on 7.32 Beta (5245) by rigpapa 2020-10-20, no issues.
 
 ## Preparation
@@ -81,6 +81,7 @@ OK. Ready? Let's see what we can configure. Remember, if any config variable is 
 
 * `NTPSERVER`: [default: `"0.openwrt.pool.ntp.org 1.openwrt.pool.ntp.org"`] Set to the IP address(es) of the NTP servers you would like to use. To remove dependency on Internet access, this should be one or more servers on your local LAN.
 * `DNSSERVER`: [default: `"8.8.8.8 8.8.4.4"` (Google DNS)] Set to the DNS servers you would like to use. The use of local or cloud DNS services makes little difference in stability to your Vera system. If your router provides DNS cache/forwarder service, that's a fine choice.
+* `KEEP_MIOS_WEATHER`: [default: 0] If non-zero, the MiOS cloud weather service will not be decoupled/disabled. This is for users of the VOTS plugin.
 * `LOG_SERVER`: [default: no log storage] Set to the (one) IP address of the server to receive logs. If blank/unset, logs are discarded. If set, you will also need to set `LOG_USER` and `LOG_PASS` to the username and password, respectively, of the FTP account on that server to receive the log files. You must also create a subdirectory of that account's home directory with the same name as the serial number of your Vera unit. The logs will be uploaded to this directory. FTP is the only protocol supported by this proces.
 * `SYSLOG_SERVER`: [default: no syslog logging] Set to the IP address of a SysLog remote server to receive logging from the Vera. If blank/not set, no remote Syslog logging will occur. The default protocol for logging is UDP, on destination port 514. You may the protocol to TCP by setting `SYSLOG_PROTO=tcp`; the port can be changed by setting `SYSLOG_PORT`.
 * `DAILY_BACKUP_SERVER`: [default: no automatic daily backups] Set to the IP address of a server to receive daily configuration backups from your Vera system. When you decouple from the cloud, the daily backups cannot be stored on Vera's servers. If blank/not set, no daily backups will be done and you must back up manually. You can set `DAILY_BACKUP_PROTO` to one of `ftp` (the default), `ftps` (for FTP+SSL), or `scp`. You should also set `DAILY_BACKUP_USER` and `DAILY_BACKUP_PASS` to the username and password of the account to receive the backup archives. A subdirectory in that account's home of the same name as the Vera serial number is required as well.

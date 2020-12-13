@@ -2,6 +2,10 @@
 
 https://github.com/toggledbits/Vera-Decouple
 
+## 20347
+
+* New KEEP_MIOS_WEATHER flag to prevent decouple/disable of weather cloud service. This is for users of the VOTS plugin and was suggested by JW (issue #3).
+
 ## 20301
 
 * Disable apps.mios.com
