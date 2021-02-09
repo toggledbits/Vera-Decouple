@@ -10,7 +10,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=20347
+_VERSION=21039
 
 askyn() {
 	local __ans
@@ -56,7 +56,7 @@ case "$p" in
 		exit 255
 esac
 fw=$(fgrep 1.7. /etc/cmh/version | sed 's/1.7.//')
-if [[ "$fw" == "" || $fw -lt 4452 || $fw -gt 5247 ]]; then
+if [[ "$fw" == "" || $fw -lt 4452 || $fw -gt 5351 ]]; then
 	echo "$0 is not certified for systems running $(cat /etc/cmh/version)."
 	exit 255
 fi
