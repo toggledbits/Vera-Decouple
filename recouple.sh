@@ -9,7 +9,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=21039
+_VERSION=21091
 
 askyn() {
 	local __ans
@@ -32,7 +32,15 @@ askyn() {
 	done
 }
 
+echo ""
 echo "Running recouple.sh version $_VERSION"
+echo ""
+echo "Before we begin, check Github to see if a newer version of this script is"
+echo "available. If so, you should download it, and then run that, particularly"
+echo "if it has been some time since you decoupled."
+echo "See https://github.com/toggledbits/Vera-Decouple/releases"
+askyn ans "Continue running with this version [Y/N]? "
+[ "$ans" == "Y" ] || exit 0
 
 SAVEDIR=${SAVEDIR:=/root/.decouple-saved}
 
@@ -114,20 +122,8 @@ if [ -n "$log" ]; then
 fi
 
 echo "Re-enabling NetworkMonitor..."
-if [ ! -s ${SAVEDIR}/check_internet ]; then
-	cp /mios/etc/init.d/check_internet /etc/init.d/
-else
-	fgrep -v 'touch /var/run/nm.stop # decouple' ${SAVEDIR}/check_internet > /etc/init.d/check_internet
-fi
-chmod +rx /etc/init.d/check_internet
-cp -p /mios/usr/bin/Rotate_Logs.sh /usr/bin/
-cp -p /mios/usr/bin/Start_NetworkMonitor.sh /usr/bin/
-chmod +rx /usr/bin/Rotate_Logs.sh /usr/bin/Start_NetworkMonitor.sh
-rm -f /var/run/nm.stop
-if [ ! -L /usr/bin/InternetOk ]; then
-	rm /usr/bin/InternetOk
-	ln -s /mios/usr/bin/InternetOk /usr/bin/
-fi
+cp -p /mios/etc/init.d/check_internet /etc/init.d/
+ln -sf /mios/usr/bin/* /usr/bin/
 
 keep_local_backup=N
 if fgrep 'decouple_daily_backup.sh' /etc/crontabs/root >/tmp/decouple-cron ; then
@@ -153,21 +149,16 @@ if [ ! -s ${SAVEDIR}/servers.conf ]; then
 else
 	cp ${SAVEDIR}/servers.conf /etc/cmh/ || exit 1
 fi
-if [ ! cp ${SAVEDIR}/services.conf /etc/cmh/ ]; then
+if [ -f /mios/usr/bin/mios-service-servers_sync.sh ]; then
+	echo "Recovering server list..."
+	/mios/usr/bin/mios-service-servers_sync.sh
+fi
+cp ${SAVEDIR}/services.conf /etc/cmh/ || {
 	echo "Recovering /etc/cmh/services.conf..."
 	/usr/bin/Report_AP.sh
-fi
+}
 # Force relay on
 sed -i 's/Permissions_Relay=.*/Permissions_Relay=1/' /etc/cmh/services.conf
-
-. /etc/cmh/servers.conf
-for s in $(awk -F= '/^Server_/ { print $1 }' /etc/cmh/servers.conf); do
-	eval "Z=\$$s"
-	echo "    + restoring ${s} to ${Z}"
-	nvram get mios_${s} >/dev/null && nvram set mios_${s}=${Z}
-	sed -i "s/^Settings_${s}=.*/Settings_${s}=${Z}/" /etc/cmh/services.conf
-done
-nvram commit >/dev/null 2>&1
 
 # Note we don't undo the move of dropbear because it's harmless and actually,
 # an improvement Vera themselves should have made.

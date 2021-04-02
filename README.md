@@ -1,5 +1,7 @@
 # Vera Cloud De-coupler/Re-coupler
 
+**CURRENT VERSION: 21091**
+
 **KNOW WHAT YOU'RE GETTING INTO: READ THIS ENTIRE DOCUMENT BEFORE DOING ANYTHING.**
 
 These scripts decouple a Vera Home Automation Controller from the many cloud services to which it normally connects. It is generally accepted that Veras are more stable when not connected to the mother ship, as outages of these cloud services often causes spurious reloads of Luup or even reboots of the system. Decoupled systems use less RAM and CPU as well.
@@ -34,15 +36,18 @@ Common sense applies here. Vera has gone to great lengths to design a system tha
 
 ## Status
 
-Vera Plus: recommended version 21039
-	* Tested on 7.31 GA (5186) by rigpapa 2020-12-12, no issues.
-	* Tested on all 7.32 Dev (to 5350) by rigpapa 2021-02-08, no issues.
+Vera Plus: recommended version 21091
 
-Vera Secure: **NOT YET TESTED** but expected to work; recommended version 20347
-	* If you are a Vera Secure user, please report your findings in the Github repository [Issues](https://github.com/toggledbits/Vera-Decouple/issues) section.
+* Tested on 7.31 GA (5186) by rigpapa 2020-12-12, no issues.
+* Tested on all 7.32 Dev (to 5350) by rigpapa 2021-02-08, no issues.
 
-Vera Edge: recommended version 20347
-	* Tested on 7.32 Beta (5245) by rigpapa 2020-10-20, no issues.
+Vera Secure: **NOT YET TESTED** but expected to work; recommended version 21091
+
+* If you are a Vera Secure user, please report your findings in the Github repository [Issues](https://github.com/toggledbits/Vera-Decouple/issues) section.
+
+Vera Edge: recommended version 21091
+
+* Tested on 7.32 Beta (5245) by rigpapa 2020-10-20, no issues.
 
 ## Preparation
 
