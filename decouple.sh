@@ -231,8 +231,8 @@ chmod +rx /usr/bin/InternetOk
 if grep '^NM_WATCHDOG_FILE=' /usr/bin/Rotate_Logs.sh >/dev/null; then
 	rm -f /usr/bin/Rotate_Logs.sh
 	sed '/^NM_WATCHDOG_FILE=/,/^fi/c \
-		# decouple removed \
-		' </mios/usr/bin/Rotate_Logs.sh >/usr/bin/Rotate_Logs.sh
+# decouple removed \
+' </mios/usr/bin/Rotate_Logs.sh | sed 's/^default_Server_Log/#default_Server_Log/I' >/usr/bin/Rotate_Logs.sh
 fi
 chmod +rx /usr/bin/Rotate_Logs.sh
 if ! grep '^exit 0 # decouple' /usr/bin/Start_NetworkMonitor.sh >/dev/null; then
@@ -293,8 +293,8 @@ if [ -z "${LOG_SERVER:-}" ]; then
 else
 	echo "Turning on log uploads to ${LOG_SERVER}..."
 	sed -i "s/Server_Log=.*/Server_Log=${LOG_SERVER}/" /etc/cmh/servers.conf
-	sed -i "s/Server_Log_User=.*/Server_Log_User=/" /etc/cmh/servers.conf
-	sed -i "s/Server_Log_Pass=.*/Server_Log_Pass=/" /etc/cmh/servers.conf
+	sed -i "s/Server_Log_User=.*/Server_Log_User=${LOG_USER}/" /etc/cmh/servers.conf
+	sed -i "s/Server_Log_Pass=.*/Server_Log_Pass=${LOG_PASS}/" /etc/cmh/servers.conf
 	sed -i 's/ArchiveLogsOnServer=.*/ArchiveLogsOnServer=1/' /etc/cmh/cmh.conf
 fi
 
