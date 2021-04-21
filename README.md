@@ -36,18 +36,18 @@ Common sense applies here. Vera has gone to great lengths to design a system tha
 
 ## Status
 
-Vera Plus: recommended version 21091
+Vera Plus: recommended version 21111
 
-* Tested on 7.31 GA (5186) by rigpapa 2020-12-12, no issues.
-* Tested on all 7.32 Dev (to 5350) by rigpapa 2021-02-08, no issues.
+* Tested on 7.31 GA (5186) by rigpapa 2020-12-12, no issues noticed.
+* Tested on all 7.32 (to 5373) by rigpapa 2021-04-21, no issues noticed.
 
-Vera Secure: **NOT YET TESTED** but expected to work; recommended version 21091
+Vera Secure: **NOT YET TESTED** but expected to work; recommended version 21111
 
 * If you are a Vera Secure user, please report your findings in the Github repository [Issues](https://github.com/toggledbits/Vera-Decouple/issues) section.
 
-Vera Edge: recommended version 21091
+Vera Edge: recommended version 21111
 
-* Tested on 7.32 Beta (5245) by rigpapa 2020-10-20, no issues.
+* Tested on all 7.32 (to 5373) by rigpapa 2021-04-21, no issues noticed.
 
 ## Preparation
 
