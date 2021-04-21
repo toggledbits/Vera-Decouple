@@ -3,14 +3,14 @@
 # ------------------------------------------------------------------------------
 #
 # decouple.sh -- Shell script to decouple Vera from its cloud services.
-# Copyright (C) 2020 Patrick H. Rigney (rigpapa), All Rights Reserved
+# Copyright (C) 2020,2021 Patrick H. Rigney (rigpapa), All Rights Reserved
 #
 # Please see decouple-config.sh for special configuration information.
 # READ THE DOCUMENTATION AT https://github.com/toggledbits/Vera-Decouple
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=21091
+_VERSION=21111
 
 askyn() {
 	local __ans
@@ -56,7 +56,7 @@ case "$p" in
 		exit 255
 esac
 fw=$(fgrep 1.7. /etc/cmh/version | sed 's/1.7.//')
-if [[ "$fw" == "" || $fw -lt 4452 || $fw -gt 5351 ]]; then
+if [[ "$fw" == "" || $fw -lt 4452 || $fw -gt 5374 ]]; then
 	echo "$0 is not certified for systems running $(cat /etc/cmh/version)."
 	exit 255
 fi
@@ -244,9 +244,6 @@ exit 0 # decouple \
 ' </mios/usr/bin/Start_NetworkMonitor.sh >/usr/bin/Start_NetworkMonitor.sh
 fi
 chmod +rx /usr/bin/Start_NetworkMonitor.sh
-if [ ! -f ${SAVEDIR}/check_internet ]; then
-	cp /etc/init.d/check_internet ${SAVEDIR}/
-fi
 if ! fgrep 'touch /var/run/nm.stop # decouple' /etc/init.d/check_internet >/dev/null; then
 	awk '/bin\/Start_NetworkMonitor.sh/ { print "touch /var/run/nm.stop # decouple.sh"; print $0; next } { print; }' </etc/init.d/check_internet >/tmp/decouple.tmp && \
 		mv /tmp/decouple.tmp /etc/init.d/check_internet
@@ -280,6 +277,7 @@ echo "Decoupling Vera cloud servers..."
 if [ ! -f ${SAVEDIR}/servers.conf ]; then
 	cp /etc/cmh/servers.conf ${SAVEDIR}/servers.conf || exit 1
 fi
+awk '/^Server_/ { sub("=.*$", "=127.0.0."NR); print; next } { print }' < ${SAVEDIR}/servers.conf > /etc/cmh/servers.conf
 . /etc/cmh/servers.conf
 for s in $(awk -F= '/^Server_/ { print $1 }' /etc/cmh/servers.conf); do
 	eval "Z=\$$s"
@@ -291,18 +289,13 @@ nvram commit >/dev/null 2>&1
 
 if [ -z "${LOG_SERVER:-}" ]; then
 	echo "Turning off log uploads..."
-	sed -i 's/ArchiveLogsOnServer=1/ArchiveLogsOnServer=0/' /etc/cmh/cmh.conf
+	sed -i 's/ArchiveLogsOnServer=.*/ArchiveLogsOnServer=0/' /etc/cmh/cmh.conf
 else
 	echo "Turning on log uploads to ${LOG_SERVER}..."
-	sed -i 's/ArchiveLogsOnServer=0/ArchiveLogsOnServer=1/' /etc/cmh/cmh.conf
+	sed -i "s/Server_Log=.*/Server_Log=${LOG_SERVER}/" /etc/cmh/servers.conf
 	sed -i "s/Server_Log_User=.*/Server_Log_User=/" /etc/cmh/servers.conf
 	sed -i "s/Server_Log_Pass=.*/Server_Log_Pass=/" /etc/cmh/servers.conf
-fi
-awk '/^Server_/ { sub("=.*$", "=127.0.0."NR); print; next } { print }' < ${SAVEDIR}/servers.conf > /etc/cmh/servers.conf
-if [ -n "${LOG_SERVER:-}" ]; then
-	sed -i "s/Server_Log=.*/Server_Log=${LOG_SERVER}/" /etc/cmh/servers.conf
-	sed -i "s/Server_Log_User=.*/Server_Log_User=${LOG_USER}/" /etc/cmh/servers.conf
-	sed -i "s/Server_Log_Pass=.*/Server_Log_Pass=${LOG_PASS}/" /etc/cmh/servers.conf
+	sed -i 's/ArchiveLogsOnServer=.*/ArchiveLogsOnServer=1/' /etc/cmh/cmh.conf
 fi
 
 # PLATFORM: NA301 on 5245, dropbear starts at 50
@@ -350,6 +343,9 @@ if [ -n "${DAILY_BACKUP_SERVER}" -a "${DAILY_BACKUP_PROTO}" == "scp" -a "${DAILY
 	echo "    /root/vera-ssh-pubkey.txt as well."
 	dropbearkey -y -f /etc/dropbear/dropbear_rsa_host_key | grep -i '^ssh-rsa' | tee /root/vera-ssh-pubkey.txt
 fi
+
+# Remove the recoupled flag from SAVEDIR
+rm -f ${SAVEDIR}/recoupled
 
 cat <<EOF
 
