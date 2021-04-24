@@ -3,13 +3,13 @@
 # ------------------------------------------------------------------------------
 #
 # recouple.sh -- Shell script to recouple Vera after a previous decouple.sh
-# Copyright (C) 2020 Patrick H. Rigney (rigpapa), All Rights Reserved
+# Copyright (C) 2020,2021 Patrick H. Rigney (rigpapa), All Rights Reserved
 #
 # Please see https://github.com/toggledbits/Vera-Decouple
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=21091
+_VERSION=21111
 
 askyn() {
 	local __ans
@@ -164,7 +164,7 @@ sed -i 's/Permissions_Relay=.*/Permissions_Relay=1/' /etc/cmh/services.conf
 # an improvement Vera themselves should have made.
 
 # Restore provisioning at boot
-if [ -z "$(ls -1 /etc/rc.d/S*-provision_vera.sh 2>/dev/null)" ]; then
+if [ -z "$(ls -1 /etc/rc.d/S*-provision_vera* 2>/dev/null)" ]; then
 	# Note on Edge is /mios, the .sh is missing; present on Plus
 	cp -P /mios/etc/rc.d/S*-provision_vera* /etc/rc.d/
 fi
@@ -179,6 +179,7 @@ rm -f /etc/init.d/decouple /etc/rc.d/S*decouple
 [ -f ${SAVEDIR}/decouple-version ] && touch ${SAVEDIR}/recoupled
 
 cat <<EOF3
+
 Done! Cloud service configuration has been restored.
 	* The changes do not take effect until you have completed a full reboot.
 	* Once you have verified that the system is working satisfactorily, you
