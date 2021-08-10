@@ -10,7 +10,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=21116
+_VERSION=21222
 
 askyn() {
     local __ans
@@ -56,7 +56,7 @@ case "$p" in
         exit 255
 esac
 fw=$(fgrep 1.7. /etc/cmh/version | sed 's/1.7.//')
-if [[ "$fw" == "" || $fw -lt 4452 || $fw -gt 5374 ]]; then
+if [[ "$fw" == "" || $fw -lt 4452 || $fw -gt 5381 ]]; then
     echo "$0 has not been tested on systems running $(cat /etc/cmh/version)."
     exit 255
 fi

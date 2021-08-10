@@ -2,6 +2,10 @@
 
 https://github.com/toggledbits/Vera-Decouple
 
+## 21222
+
+* Fix error in command line argument handling in recoupler.
+
 ## 20347
 
 * New KEEP_MIOS_WEATHER flag to prevent decouple/disable of weather cloud service. This is for users of the VOTS plugin and was suggested by JW (issue #3).

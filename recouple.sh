@@ -9,7 +9,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=21116
+_VERSION=21222
 
 askyn() {
     local __ans
@@ -32,23 +32,39 @@ askyn() {
     done
 }
 
-echo ""
-echo "Running recouple.sh version $_VERSION"
-echo ""
-echo "Before we begin, check Github to see if a newer version of this script is"
-echo "available. If so, you should download it, and then run that, particularly"
-echo "if it has been some time since you decoupled."
-echo "See https://github.com/toggledbits/Vera-Decouple/releases"
-askyn ans "Continue running with this version [Y/N]? "
-[ "$ans" == "Y" ] || exit 0
-
 SAVEDIR=${SAVEDIR:=/root/.decouple-saved}
 
 FORCE=0
-if [ "${1:-}" == "-f" ]; then
-    shift
-    FORCE=1
+SILENT=0
+while [ -n "${1:-}" ]; do
+    case "$1" in
+        "-f" )
+            FORCE=1
+            SILENT=1
+            shift
+            ;;
+        "-s" )
+            SILENT=1
+            shift
+            ;;
+        * )
+            echo "Invalid command line flag: $1"
+            exit 255
+    esac
+done
+
+if [ $SILENT -eq 0 ]; then
+    echo ""
+    echo "Running recouple.sh version $_VERSION"
+    echo ""
+    echo "Before we begin, check Github to see if a newer version of this script is"
+    echo "available. If so, you should download it, and then run that, particularly"
+    echo "if it has been some time since you decoupled."
+    echo "See https://github.com/toggledbits/Vera-Decouple/releases"
+    askyn ans "Continue running with this version [Y/N]? "
+    [ "$ans" == "Y" ] || exit 0
 fi
+
 if [ $FORCE -eq 0 ]; then
     if [ ! -d ${SAVEDIR} ]; then
         cat <<-EOF1
@@ -108,7 +124,7 @@ uci commit dhcp
 /etc/init.d/dnsmasq restart
 
 log=$(uci -q get system.@system[0].log_ip)
-if [ -n "$log" ]; then
+if [ -n "$log" -a $SILENT -eq 0 ]; then
     echo ; echo "You have enabled remote system logging (via syslog) to $log."
     askyn keep_log "Continue remote syslog [y/n]? "
     if [ "$keep_log" == "N" ]; then
@@ -126,11 +142,15 @@ cp -p /mios/etc/init.d/check_internet /etc/init.d/
 ln -sf /mios/usr/bin/* /usr/bin/
 
 keep_local_backup=N
-if fgrep 'decouple_daily_backup.sh' /etc/crontabs/root >/tmp/decouple-cron ; then
-    echo ; echo "Local daily backups are enabled. Recoupling will restart the cloud backups to"
-    echo "Vera/MiOS/eZLO, but you have the option of continuing the local backups simul-"
-    echo "taneously or disabling them."
-    askyn keep_local_backup "Keep doing the daily local backups [y/n]? "
+if [ $SILENT -eq 0 ]; then
+    if fgrep 'decouple_daily_backup.sh' /etc/crontabs/root >/tmp/decouple-cron ; then
+        echo ; echo "Local daily backups are enabled. Recoupling will restart the cloud backups to"
+        echo "Vera/MiOS/eZLO, but you have the option of continuing the local backups simul-"
+        echo "taneously or disabling them."
+        askyn keep_local_backup "Keep doing the daily local backups [y/n]? "
+    fi
+else
+    keep_local_backup=Y
 fi
 
 echo "Restoring root's crontab..."
@@ -171,14 +191,20 @@ fi
 if [ -z "$(ls -1 /etc/rc.d/S*-cmh-ra 2>/dev/null)" ]; then
     cp -P /mios/etc/rc.d/S*-cmh-ra /etc/rc.d/
 fi
+
 # NB: Not replacing mios_fix_time, since its brokenness is regressive.
+rm -f /etc/rc.d/S*mios_fix_time*
 
 # And our own boot script
 rm -f /etc/init.d/decouple /etc/rc.d/S*decouple
 
 [ -f ${SAVEDIR}/servers.conf ] && touch ${SAVEDIR}/recoupled
 
-cat <<EOF3
+if [ $SILENT -ne 0 ]; then
+    sleep 5
+    /sbin/reboot
+else
+    cat <<EOF3
 
 Done! Cloud service configuration has been restored.
     * The changes do not take effect until you have completed a full reboot.
@@ -188,5 +214,6 @@ Done! Cloud service configuration has been restored.
 
 Reboot your Vera now by typing: /sbin/reboot
 EOF3
+fi
 
 exit 0
