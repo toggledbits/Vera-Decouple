@@ -56,7 +56,7 @@ case "$p" in
         exit 255
 esac
 fw=$(fgrep 1.7. /etc/cmh/version | sed 's/1.7.//')
-if [[ "$fw" == "" || $fw -lt 4452 || $fw -gt 5381 ]]; then
+if [[ "$fw" == "" || $fw -lt 4452 || $fw -gt 5387 ]]; then
     echo "$0 has not been tested on systems running $(cat /etc/cmh/version)."
     exit 255
 fi

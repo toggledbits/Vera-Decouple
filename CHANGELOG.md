@@ -4,6 +4,7 @@ https://github.com/toggledbits/Vera-Decouple
 
 ## 21222
 
+* Support for 7.32 beta 4 (5385/6/7)
 * Fix error in command line argument handling in recoupler.
 
 ## 20347
