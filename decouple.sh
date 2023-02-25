@@ -10,7 +10,7 @@
 #
 # ------------------------------------------------------------------------------
 
-_VERSION=21222
+_VERSION=23056
 
 askyn() {
     local __ans
@@ -196,7 +196,7 @@ if [ -n "${DAILY_BACKUP_SERVER:-}" ]; then
     usr=${DAILY_BACKUP_USER:-verabackup}
     if [ "${DAILY_BACKUP_PROTO:-}" == "scp" ]; then
         if [ "${DAILY_BACKUP_PASS:-}" == "@" ]; then
-            opts="-i /etc/dropbear/dropbear_rsa_host_key"
+            opts="-i /etc/dropbear/dropbear_ecdsa_host_key"
             targ="${usr}@${DAILY_BACKUP_SERVER}"
         else
             opts=""
@@ -373,7 +373,7 @@ if [ -n "${DAILY_BACKUP_SERVER}" -a "${DAILY_BACKUP_PROTO}" == "scp" -a "${DAILY
     echo "    Although it may wrap on your screen, it should be placed as a single (long)"
     echo "    line in the authorized_hosts file. A copy of this key has been left in file"
     echo "    /root/vera-ssh-pubkey.txt as well."
-    dropbearkey -y -f /etc/dropbear/dropbear_rsa_host_key | grep -i '^ssh-rsa' | tee /root/vera-ssh-pubkey.txt
+    dropbearkey -y -f /etc/dropbear/dropbear_ecdsa_host_key | grep -i '^ecdsa' | tee /root/vera-ssh-pubkey.txt
 fi
 
 # Remove the recoupled flag from SAVEDIR

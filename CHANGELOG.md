@@ -2,6 +2,10 @@
 
 https://github.com/toggledbits/Vera-Decouple
 
+## 23056
+
+* Switch key for password-less backups to Vera's ECDSA key (was RSA). The RSA key type is no longer accepted by modern SSH servers (such as that on Ubuntu 22.04 and up) because of the weak SHA1 hash it uses. Since Veras are now quite old in the software sense, the encryption/key choices are few, and as of now, ECDCSA is the only remaining key type that works with newer SSH servers. If you previously configured password-less backup, you will need to redo the steps described in the README to add the new ECDSA key.
+
 ## 21222
 
 * Support for 7.32 beta 4 (5385/6/7)

@@ -1,6 +1,6 @@
 # Vera Cloud De-coupler/Re-coupler
 
-**CURRENT VERSION: 21222**
+**CURRENT VERSION: 23056**
 
 **KNOW WHAT YOU'RE GETTING INTO: READ THIS ENTIRE DOCUMENT BEFORE DOING ANYTHING.**
 
@@ -33,21 +33,6 @@ Decoupling from Vera's cloud is not without consequences; these include:
 * Daily backups of your system to Vera's storage won't be done. The script provides a facility for daily backups to be performed and uploaded to a local server that you provide, if you wish. Otherwise, you will need to do backups manually.
 
 Common sense applies here. Vera has gone to great lengths to design a system that runs tightly with their cloud services. Disabling their cloud services forces the system to run in a manner counter to its design, and that has inherent risks known, anticipated, and unforeseen. You accept these risks as your own and are going in eyes wide open.
-
-## Status
-
-Vera Plus: recommended version 21222
-
-* Tested on 7.31 GA (5186) by rigpapa 2020-12-12, no issues noticed.
-* Tested on all 7.32 (to 5373) by rigpapa 2021-04-21, no issues noticed.
-
-Vera Secure: **NOT YET TESTED** but expected to work; recommended version 21222
-
-* If you are a Vera Secure user, please report your findings in the Github repository [Issues](https://github.com/toggledbits/Vera-Decouple/issues) section.
-
-Vera Edge: recommended version 21222
-
-* Tested on all 7.32 (to 5373) by rigpapa 2021-04-21, no issues noticed.
 
 ## Preparation
 
@@ -90,9 +75,9 @@ OK. Ready? Let's see what we can configure. Remember, if any config variable is 
 * `KEEP_MIOS_WEATHER`: [default: 0] If non-zero, the MiOS cloud weather service will not be decoupled/disabled. This is for users of the VOTS plugin.
 * `LOG_SERVER`: [default: no log storage] Set to the (one) IP address of the server to receive logs. If blank/unset, logs are discarded. If set, you will also need to set `LOG_USER` and `LOG_PASS` to the username and password, respectively, of the FTP account on that server to receive the log files. You must also create a subdirectory of that account's home directory with the same name as the serial number of your Vera unit. The logs will be uploaded to this directory. FTP is the only protocol supported by this proces.
 * `SYSLOG_SERVER`: [default: no syslog logging] Set to the IP address of a SysLog remote server to receive logging from the Vera. If blank/not set, no remote Syslog logging will occur. The default protocol for logging is UDP, on destination port 514. You may the protocol to TCP by setting `SYSLOG_PROTO=tcp`; the port can be changed by setting `SYSLOG_PORT`.
-* `DAILY_BACKUP_SERVER`: [default: no automatic daily backups] Set to the IP address of a server to receive daily configuration backups from your Vera system. When you decouple from the cloud, the daily backups cannot be stored on Vera's servers. If blank/not set, no daily backups will be done and you must back up manually. You can set `DAILY_BACKUP_PROTO` to one of `ftp` (the default), `ftps` (for FTP+SSL), or `scp`. You should also set `DAILY_BACKUP_USER` and `DAILY_BACKUP_PASS` to the username and password of the account to receive the backup archives. A subdirectory in that account's home of the same name as the Vera serial number is required as well.
+* `DAILY_BACKUP_SERVER`: [default: no automatic daily backups] Set to the IP address of a server to receive daily configuration backups from your Vera system. When you decouple from the cloud, the daily backups cannot be stored on Vera's servers. If blank/not set, no daily backups will be done and you must back up manually. You can set `DAILY_BACKUP_PROTO` to one of `ftp` (the default), `ftps` (for FTP+SSL), or `scp`. You should also set `DAILY_BACKUP_USER` and `DAILY_BACKUP_PASS` to the username and password of the account to receive the backup archives. A subdirectory in that account's home of the same name as the Vera serial number is required as well. Password-less backup using public key authentication is possible; see below.
 
-> If you are using `scp` for daily backup uploading and would like to use public key authentication rather than hard-coding a password here, set `DAILY_BACKUP_PASS` to `@`. Then retrieve your Vera's public key by running `dropbearkey -y -f /etc/dropbear/dropbear_rsa_host_key` on the Vera command line; copy/append that text *except the header and `Fingerprint` line* into the `authorized_keys` file or equivalent for the target system's user account (e.g. on Linux, this would be `~user/.ssh/authorized_keys` on the target server).
+> If you are using `scp` for daily local backups and would like to use public key authentication rather than hard-coding a password here, set `DAILY_BACKUP_PASS` to `@`. Then run `decouple.sh`. After is runs, you will find a file `vera_ssh_key.txt` in the `/root` folder. Append the contents of this file to the `authorized_keys` file or equivalent for the *target system's* user account (e.g. on Linux, this would be `~user/.ssh/authorized_keys` on the target server, where `user` is the username you assigned as the backup destination user). If the file doesn't exist, you can create it, but make sure it is owned by the target user and has not world-read/write/execute (no world permissions at all, e.g. `chmod 640 authorized_keys` on Linux).
 
 ## Running `decouple.sh`
 
